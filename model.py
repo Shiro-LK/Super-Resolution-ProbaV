@@ -233,13 +233,13 @@ def FSRCNN_(input_shape, depth_multi=1, multi_output=False, scale=3):
 
 def FSRCNNv2(input_shape, depth_multi=1, multi_output=False, scale=3):
     inputs = Input(input_shape, name="inputs")
-    conv1 = Convolution2D(filters=64, kernel_size=5, padding="same", name="conv1", activation="elu")(inputs)
+    conv1 = Convolution2D(filters=56, kernel_size=5, padding="same", name="conv1", activation="elu")(inputs)
    
-    conv2 = Convolution2D(filters=12, kernel_size=1, padding="same", name="conv2", activation="elu")(conv1)
+    conv2 = Convolution2D(filters=12, kernel_size=3, padding="same", name="conv2", activation="elu")(conv1)
     conv3 = conv2
     for i in range(4):
         conv3 = Convolution2D(filters=12, kernel_size=5, padding="same", name="conv3_"+str(i), activation="elu")(conv3)
-    conv4 = Convolution2D(filters=64, kernel_size=1, padding="same", name="conv4", activation="elu")(conv3)
+    conv4 = Convolution2D(filters=56, kernel_size=3, padding="same", name="conv4", activation="elu")(conv3)
 
     #mapping = Convolution2D(filters=32, kernel_size=1, padding="same", name="mapping", activation="relu")(conv4)
     if multi_output:

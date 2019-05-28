@@ -83,8 +83,8 @@ multi_output=True
 k=9
 train = preprocess_data(data_train, istrain=True,version=version,k=k)
 val  = preprocess_data(data_val, istrain=True, version=1,k=k)
-val3 = preprocess_data(data_val, istrain=True, version=3,k=k)
-val4 = preprocess_data(data_val, istrain=True, version=4,k=k)
+
+all_train = train = preprocess_data(data_train, istrain=False,version=version,k=k)
 test = preprocess_data(data_test, istrain=False, version=version,k=k)
 name_model ="SRVGG16_v4_withclearance_concat_multi_k9"#"SRCNNv1"#"FSRCNNv1_withclearance_sum"
 model = load_model(name_model+".hdf5")
@@ -93,6 +93,6 @@ model = load_model(name_model+".hdf5")
 #                       type_clearance=type_clearance, scale=scale, resize=resize, version=version)
 #get_validation_results(model, val4, with_clearance=with_clearance, multi_output=multi_output,
  #                      type_clearance=type_clearance, scale=scale, resize=resize, version=version)
-directory = "results_" + name_model
+directory = "results_train_" + name_model
 predict_results(model, test, directory, with_clearance=with_clearance, multi_output=multi_output,
                        type_clearance=type_clearance, scale=scale, resize=resize, version=version)

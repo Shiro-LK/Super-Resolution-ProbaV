@@ -385,6 +385,15 @@ def baseline_predict_test(data, dirs = "results_baseline", interpolation=cv2.INT
             #names[i] = p.parts[-2]
             save_prediction(img_predict, p.parts[-2], directory=dirs)
     
+
+def load_image2D(path, expand=False):
+    img = skimage.img_as_float64( cv2.imread(path, -1) )
+    #height, width = img.shape
+    #if scale > 1:
+    #    img = cv2.resize(img,  (height*scale, width*scale), interpolation = cv2.INTER_CUBIC)
+    if expand:
+        img = np.expand_dims(img, axis=2)
+    return img
     
 def save_prediction(pred, names, directory):
     try:
