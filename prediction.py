@@ -13,7 +13,7 @@ import skimage
 import keras
 from keras import backend as K
 from keras.models import Model
-
+import random
 random.seed(20)
 import time
 import gc
@@ -76,23 +76,23 @@ data_train, data_val = train_test_split(datas, test_size=0.1, shuffle=True, rand
 
 scale = 3
 resize=True
-with_clearance=True
+with_clearance=False
 type_clearance="concat"
 version=4
 multi_output=True
 k=9
 train = preprocess_data(data_train, istrain=True,version=version,k=k)
-val  = preprocess_data(data_val, istrain=True, version=1,k=k)
+val  = preprocess_data(data_val, istrain=True, version=version,k=k)
 
-all_train = train = preprocess_data(data_train, istrain=False,version=version,k=k)
+all_train = preprocess_data(data_train, istrain=False,version=version,k=k)
 test = preprocess_data(data_test, istrain=False, version=version,k=k)
-name_model ="SRVGG16_v4_withclearance_concat_multi_k9"#"SRCNNv1"#"FSRCNNv1_withclearance_sum"
+name_model ="SRCNNex_v4_noclearance_k9"#"SRVGG16_v4_withclearance_concat_multi_k9"#"SRCNNv1"#"FSRCNNv1_withclearance_sum"
 model = load_model(name_model+".hdf5")
 
-#get_validation_results(model, train, with_clearance=with_clearance,  multi_output=multi_output,
-#                       type_clearance=type_clearance, scale=scale, resize=resize, version=version)
-#get_validation_results(model, val4, with_clearance=with_clearance, multi_output=multi_output,
- #                      type_clearance=type_clearance, scale=scale, resize=resize, version=version)
-directory = "results_train_" + name_model
+get_validation_results(model, train, with_clearance=with_clearance,  multi_output=multi_output,
+                       type_clearance=type_clearance, scale=scale, resize=resize, version=version)
+get_validation_results(model, val, with_clearance=with_clearance, multi_output=multi_output,
+                       type_clearance=type_clearance, scale=scale, resize=resize, version=version)
+directory = "results/results_" + name_model
 predict_results(model, test, directory, with_clearance=with_clearance, multi_output=multi_output,
                        type_clearance=type_clearance, scale=scale, resize=resize, version=version)

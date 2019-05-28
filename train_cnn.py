@@ -49,9 +49,9 @@ data_train, data_val = train_test_split(datas, test_size=0.1, shuffle=True,
                                         random_state=42)
 
 ## preprocess data
-k=9
+k=5
 scale = 3
-resize=False
+resize=True
 with_clearance= False
 type_clearance= "sum"
 version=4
@@ -63,10 +63,10 @@ val  = preprocess_data(data_val, istrain=True, version=version_val, k = k)
 
 #name_mod = "SRCNNv1_v1_withclearance_concat_multi_loss2.hdf5"
 #name_mod = "SRCNNv1_v4_withclearance_concat.hdf5"
-name_mod = "FSRCNNv2_v4_noclearance_k9.hdf5"
+name_mod = "SRCNNex_v4_noclearance_k5.hdf5" #"SRVGG16_v4_noclearance_k9.hdf5" # "FSRCNNv2_v4_noclearance_k9.hdf5" #
 checkpoint = ModelCheckpoint(name_mod, verbose=2, 
                              monitor='val_cPSNR_'+str(version_val ), save_best_only=True, save_weights_only=False, mode='min')
-batch_size=32
+batch_size=16
 #load model and parameters
 c = 1 if version != 4 else  k
 channel = c*1 if with_clearance == False or type_clearance=="sum" else c*2
@@ -78,10 +78,10 @@ opt = Nadam(0.001)  #SRresnet 0.0005
 ## multi output
 multi_output=True
 #model = SRCNN((128*scale, 128*scale ,channel), 1, multi_output) 
-#model = SRCNN((128*scale, 128*scale ,channel), 1, multi_output) 
+model = SRCNNex((128*scale, 128*scale ,channel), 1, multi_output) 
 #model = SRCNN((128*scale, 128*scale ,channel), 1, multi_output) 
 #model = SRVGG16((128*scale, 128*scale ,channel), 1, multi_output) 
-model = FSRCNNv2((128, 128, channel), 1, multi_output, scale=scale)
+#model = FSRCNNv2((128, 128, channel), 1, multi_output, scale=scale)
 model.summary()
 if multi_output:
     model.compile(loss=custom_loss, optimizer=opt)
@@ -90,7 +90,7 @@ else:
     model.compile(loss=MSE, optimizer=opt)
 
 
-#weights_ = "FSRCNN_v4_noclearance_k9_.hdf5"#"vgg16_weights_tf_dim_ordering_tf_kernels.h5"#"SRVGG16_v4_withclearance_concat_multi.hdf5"#"SRCNNv1_v4_withclearance_concat_multi_k9.hdf5"#"SRVGG16_v4_withclearance_concat_multi.hdf5"
+#weights_ = "SRVGG16_v4_withclearance_concat_multi_k9.hdf5"#"FSRCNN_v4_noclearance_k9_.hdf5"#"vgg16_weights_tf_dim_ordering_tf_kernels.h5"#"SRVGG16_v4_withclearance_concat_multi.hdf5"#"SRCNNv1_v4_withclearance_concat_multi_k9.hdf5"#"SRVGG16_v4_withclearance_concat_multi.hdf5"
 #model.load_weights(weights_, by_name=True, skip_mismatch=True)
 
 #model.load_weights("vgg16_weights_tf_dim_ordering_tf_kernels.h5", by_name=True, skip_mismatch=True)
