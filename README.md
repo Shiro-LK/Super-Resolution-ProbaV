@@ -9,7 +9,7 @@ To train/validate and test a model, use : [DeepLearning-proba-v.ipynb](https://g
 
 A baseline using opencv and Bicubic interpolation was also used. It is available in the file : [baseline_opencv.ipynb](https://github.com/Shiro-LK/Super-Resolution-ProbaV/blob/master/baseline_opencv.ipynb)
 
-The best model use the SRCNN concept with few convolution blocks from VGG16. (validation : 0.989 / test 0.984 on leaderboard)
+The best model this repo uses the SRCNN concept with few convolution blocks from VGG16. (validation : 0.989 / test 0.984 on leaderboard)
 ### About the competition
 website : https://kelvins.esa.int/proba-v-super-resolution
 
