@@ -157,7 +157,7 @@ def SRCNNv3(input_shape, depth_multiplier=1, multi_output=False):
         return Model(inputs, [out, out2, out3])
     return Model(inputs, out)
 
-def SRCNNex(input_shape, depth_multiplier=1, multi_output=False): # 1.0115
+def SRCNNex(input_shape, depth_multiplier=1, multi_output=False): 
     inputs = Input(input_shape, name="inputs")
     conv1 = Convolution2D(filters=64, kernel_size=9, padding="same", name="conv1", activation="relu")(inputs)
     mapping = Convolution2D(filters=32, kernel_size=5, padding="same", name="mapping", activation="relu")(conv1)
@@ -231,22 +231,46 @@ def FSRCNN_(input_shape, depth_multi=1, multi_output=False, scale=3):
 
 
 
-def FSRCNNv2(input_shape, depth_multi=1, multi_output=False, scale=3):
+def FSRCNNv2(input_shape, depth_multi=1, multi_output=False, scale=3, finetuned=False):
     inputs = Input(input_shape, name="inputs")
     conv1 = Convolution2D(filters=56, kernel_size=5, padding="same", name="conv1", activation="elu")(inputs)
    
-    conv2 = Convolution2D(filters=12, kernel_size=3, padding="same", name="conv2", activation="elu")(conv1)
+    conv2 = Convolution2D(filters=12, kernel_size=1, padding="same", name="conv2", activation="elu")(conv1)
     conv3 = conv2
     for i in range(4):
-        conv3 = Convolution2D(filters=12, kernel_size=5, padding="same", name="conv3_"+str(i), activation="elu")(conv3)
-    conv4 = Convolution2D(filters=56, kernel_size=3, padding="same", name="conv4", activation="elu")(conv3)
+        conv3 = Convolution2D(filters=12, kernel_size=3, padding="same", name="conv3_"+str(i), activation="elu")(conv3)
+    conv4 = Convolution2D(filters=56, kernel_size=1, padding="same", name="conv4", activation="elu")(conv3)
 
     #mapping = Convolution2D(filters=32, kernel_size=1, padding="same", name="mapping", activation="relu")(conv4)
-    if multi_output:
-        out = Conv2DTranspose(filters=2, kernel_size=5, strides=scale, padding="same", name="output", activation="sigmoid")(conv4)
-    else:
-        out = Conv2DTranspose(filters=1, kernel_size=5, strides=scale, padding="same", name="output", activation="sigmoid")(conv4)
+    if finetuned == False:
+        if multi_output:
+            out = Conv2DTranspose(filters=2, kernel_size=5, strides=scale, padding="same", name="output", activation="sigmoid")(conv4)
+        else:
+            out = Conv2DTranspose(filters=1, kernel_size=5, strides=scale, padding="same", name="output", activation="sigmoid")(conv4)
 
+    else:
+        deconv = Conv2DTranspose(filters=32, kernel_size=5, strides=scale, padding="same", name="deconv", activation="elu")(conv4)
+        conv1 = Convolution2D(filters=64, kernel_size=9, padding="same", name="conv1", activation="relu")(deconv)
+        mapping = Convolution2D(filters=32, kernel_size=5, padding="same", name="mapping", activation="relu")(conv1)
+        
+        if multi_output:
+            out = Convolution2D(filters=2, kernel_size=5, padding="same", name="output", activation="sigmoid")(mapping)
+        else:
+            out = Convolution2D(filters=1, kernel_size=5, padding="same", name="output", activation="sigmoid")(mapping)
+    
+#        # Block 1
+#        x = Convolution2D(filters=64, kernel_size=(3, 3), activation='relu', padding='same', name='block1_conv1')(deconv)
+#        x = Convolution2D(filters=64, kernel_size=(3, 3),activation='relu', padding='same', name='block1_conv2')(x)
+#    
+#        # Block 2
+#        x = Convolution2D(filters=128, kernel_size=(3, 3), activation='relu',padding='same', name='block2_conv1')(x)
+#        x = Convolution2D(filters=128, kernel_size=(3, 3), activation='relu',padding='same', name='block2_conv2')(x)
+#    
+#        mapping =  Convolution2D(filters=32, kernel_size=5, padding="same", name="mapping", activation="relu")(x)
+#        if multi_output:
+#            out = Convolution2D(filters=2, kernel_size=5, padding="same", name="output", activation="sigmoid")(mapping)
+#        else:
+#            out = Convolution2D(filters=1, kernel_size=5, padding="same", name="output", activation="sigmoid")(mapping)
     return Model(inputs, out)    
   
 
