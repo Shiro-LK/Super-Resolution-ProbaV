@@ -79,7 +79,7 @@ ipython_config.py
 
 # pyenv
 .python-version
-
+vgg16_weights_tf_dim_ordering_tf_kernels.h5
 # celery beat schedule file
 celerybeat-schedule
 
