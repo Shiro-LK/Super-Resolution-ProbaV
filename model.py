@@ -66,6 +66,10 @@ def PSNR(y_true, y_pred):
     return  -10*K.log(error)/ K.log(10.0)   # first dim is the batch
 
 def custom_loss(y_true, y_pred):
+    """
+        custom loss function based on cMSE and cPSNR
+        add the crossentropy with cPSNR loss
+    """
     sr = y_pred[:,:,:,0]
     sr_clear = y_pred[:,:,:,1]
     hr = y_true[:,:,:,0]
@@ -98,7 +102,9 @@ def custom_loss(y_true, y_pred):
       
 def SRCNN(input_shape, depth_multiplier=1, multi_output=False):
     """
-        # last 1.0237 filter1 | 1.015 filter 7 | 1.021 filter 3 | 1.013 filter 5 | filter 9 
+        first conv = extract features
+        2nd conv = mapping
+        3rd conv = prediction
 
     """
     inputs = Input(input_shape, name="inputs")

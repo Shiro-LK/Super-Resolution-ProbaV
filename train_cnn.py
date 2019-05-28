@@ -12,7 +12,7 @@ import time
 
 from numba import prange #parallise loop
 from generator import batch_generator_SRCNN
-from functions import load_data, preprocess_data, cPSNR_callback
+from functions import load_data, preprocess_data, cPSNR_callback, compute_steps
 K.clear_session()
 from tensorflow.compat.v1 import ConfigProto
 from tensorflow.compat.v1 import InteractiveSession
@@ -21,18 +21,7 @@ config.gpu_options.allow_growth = True
 session = InteractiveSession(config=config)
 
 
-def compute_steps(data, batch_size, version=1):
-    n=0
-    if version == 1:
-        for LR_QM, _,_,_ in data:
-            n += len(LR_QM)
-    elif version == 2 or version == 4:
-        n = len(data)
-    elif version == 3:
-        for LR_QM, _,_,_ in data:
-            n += len(LR_QM)
 
-    return math.ceil(n/batch_size) 
            
 
     
@@ -66,7 +55,7 @@ val  = preprocess_data(data_val, istrain=True, version=version_val, k = k)
 name_mod = "SRCNNex_v4_noclearance_k5.hdf5" #"SRVGG16_v4_noclearance_k9.hdf5" # "FSRCNNv2_v4_noclearance_k9.hdf5" #
 checkpoint = ModelCheckpoint(name_mod, verbose=2, 
                              monitor='val_cPSNR_'+str(version_val ), save_best_only=True, save_weights_only=False, mode='min')
-batch_size=16
+batch_size=32
 #load model and parameters
 c = 1 if version != 4 else  k
 channel = c*1 if with_clearance == False or type_clearance=="sum" else c*2

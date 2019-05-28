@@ -14,7 +14,7 @@ import skimage
 import keras
 from keras.callbacks import Callback
 import random
-
+import math
 random.seed(20)
 import time
 import gc
@@ -52,6 +52,20 @@ def preprocess_data(data, istrain=True,  version=1, k=9):
                 
 
     return data_preprocess
+
+def compute_steps(data, batch_size, version=1):
+    n=0
+    if version == 1:
+        for LR_QM, _,_,_ in data:
+            n += len(LR_QM)
+    elif version == 2 or version == 4:
+        n = len(data)
+    elif version == 3:
+        for LR_QM, _,_,_ in data:
+            n += len(LR_QM)
+
+    return math.ceil(n/batch_size) 
+
 ## load one scene data
 def get_scene(path, istrain=True, version=1, k=9):
     """
