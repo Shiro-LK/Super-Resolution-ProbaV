@@ -27,6 +27,10 @@ import gc
 import numba
 from numba import prange #parallise loop
 def load_image2D(path, expand=False):
+    """
+        @path : absolute path of the image to load
+        @expand : if true, add a dimension in the last channel. Usefull for grayscale image => (n, n ) to (n, n, 1)
+    """
     img = skimage.img_as_float64( cv2.imread(path, -1) )
     #height, width = img.shape
     #if scale > 1:
@@ -36,6 +40,11 @@ def load_image2D(path, expand=False):
     return img
 
 def change_contrast(img, img2, img3, img4):
+    """
+        data augmentation function.
+        The goal is to change the constrast with the same parameters for each of these 4 images.
+        @img, @img2, @img3, @img4 : all are images with the same dimension
+    """
     alpha = np.random.uniform(0.9,1.0)
     beta = np.random.uniform(0,0.1)
     img = alpha * img + beta
@@ -60,7 +69,7 @@ def change_contrast(img, img2, img3, img4):
 def data_augmentation(x, clear_x, y, clear_y):
     """
         apply the same transformation for each of these 4 images
-        clear_x, and clear_y can be None
+        clear_x, and clear_y can be None (clearance images)
     """
     hasAug = np.random.uniform()
     if hasAug <=0.5: # no augmentation
@@ -131,6 +140,7 @@ def data_augmentation(x, clear_x, y, clear_y):
                 
                 
         return x, clear_x, y, clear_y
+    
 def batch_transform(img1, img2=None, type_clearance="sum", version=1):
     """
         transform array of img into batch of array of img given the type of clearance we want to apply
@@ -150,6 +160,7 @@ def batch_transform(img1, img2=None, type_clearance="sum", version=1):
                 img1 = np.expand_dims(img1, axis=-1)
                 img2 = np.expand_dims(img2, axis=-1)
             return np.concatenate((img1, img2), axis=-1)
+        
 def batch_resize(img1, img2=None, dim=(384, 384), type_clearance="sum", version=1):
     """
         @img1, img2 : can be a list of img or an array of img (num_img, n, n)
