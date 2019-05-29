@@ -70,11 +70,12 @@ def custom_loss(y_true, y_pred):
         custom loss function based on cMSE and cPSNR
         add the crossentropy with cPSNR loss
     """
+    #print(K.int_shape(y_pred))
     sr = y_pred[:,:,:,0]
     sr_clear = y_pred[:,:,:,1]
     hr = y_true[:,:,:,0]
     hr_clear = y_true[:,:,:,1]
-    dim = K.int_shape(y_pred)[1]
+    dim = 384 #K.int_shape(y_pred)[1]
     diff = hr - sr
     denominateur = K.sum(hr_clear, axis=(1,2))
 
@@ -105,7 +106,7 @@ def SRCNN(input_shape, depth_multiplier=1, multi_output=False):
         first conv = extract features
         2nd conv = mapping
         3rd conv = prediction
-
+        @ multi_output : set to True 
     """
     inputs = Input(input_shape, name="inputs")
     conv1 = Convolution2D(filters=64*depth_multiplier, kernel_size=9, padding="same", name="conv1", activation="relu")(inputs)
@@ -124,6 +125,7 @@ def SRCNNv2(input_shape, depth_multiplier=1, multi_output=False):
     """
         conv 9-64 puis 7-64 puis 5-32 puis 7-1 -> 1.006 120 epoch
         conv 9-128 puis 7-64 puis 5-32 puis 7-16 puis 9-1 -> 1.007 130 epoch
+        @ multi_output : set to True 
     """
     inputs = Input(input_shape, name="inputs")
     conv1 = Convolution2D(filters=64, kernel_size=9, padding="same", name="conv1", activation="relu")(inputs)
@@ -142,7 +144,7 @@ def SRCNNv2(input_shape, depth_multiplier=1, multi_output=False):
 
 def SRCNNv3(input_shape, depth_multiplier=1, multi_output=False):
     """
-            
+        @ multi_output : set to True 
     """
     inputs = Input(input_shape, name="inputs")
     deconv = Conv2DTranspose(filters=32, kernel_size=7, strides=3, padding="same", name="deconv", activation="relu")(inputs)
@@ -164,6 +166,11 @@ def SRCNNv3(input_shape, depth_multiplier=1, multi_output=False):
     return Model(inputs, out)
 
 def SRCNNex(input_shape, depth_multiplier=1, multi_output=False): 
+    """
+        Implementation of SRCNNex. The kernel size of the mapping layer is increased from 1 to 5.
+        @ multi_output : set to True 
+    """
+    
     inputs = Input(input_shape, name="inputs")
     conv1 = Convolution2D(filters=64, kernel_size=9, padding="same", name="conv1", activation="relu")(inputs)
     mapping = Convolution2D(filters=32, kernel_size=5, padding="same", name="mapping", activation="relu")(conv1)
@@ -198,6 +205,7 @@ def SRVGG16(input_shape, depth_multi=1, multi_output=False): # 1.006
 
 
 def FSRCNN(input_shape, depth_multi=1, multi_output=False, scale=3):
+    
     inputs = Input(input_shape, name="inputs")
     conv1 = Convolution2D(filters=56, kernel_size=5, padding="same", name="conv1", activation="relu")(inputs)
    
@@ -216,13 +224,14 @@ def FSRCNN(input_shape, depth_multi=1, multi_output=False, scale=3):
     return Model(inputs, out)    
 
 def FSRCNN_(input_shape, depth_multi=1, multi_output=False, scale=3):
+    
     inputs = Input(input_shape, name="inputs")
     conv1 = Convolution2D(filters=56, kernel_size=5, padding="same", name="conv1")(inputs)
     conv1 = PReLU(name="conv1_prelu")(conv1)
     conv2 = Convolution2D(filters=12, kernel_size=1, padding="same", name="conv2")(conv1)
     conv3 = PReLU(name="conv2_prelu")(conv2)
     for i in range(4):
-        conv3 = Convolution2D(filters=12, kernel_size=3, padding="same", name="conv3_"+str(i))(conv3)
+        conv3 = Convolution2D(filters=12, kernel_size=5, padding="same", name="conv3_"+str(i))(conv3)
         conv3 = PReLU(name="conv3_" +str(i) +"_prelu")(conv3)
     conv4 = Convolution2D(filters=56, kernel_size=1, padding="same", name="conv4")(conv3)
     conv4 = PReLU(name="conv4_prelu")(conv4)
@@ -238,6 +247,9 @@ def FSRCNN_(input_shape, depth_multi=1, multi_output=False, scale=3):
 
 
 def FSRCNNv2(input_shape, depth_multi=1, multi_output=False, scale=3, finetuned=False):
+    
+    # 0.98958 55 epoch
+    
     inputs = Input(input_shape, name="inputs")
     conv1 = Convolution2D(filters=56, kernel_size=5, padding="same", name="conv1", activation="elu")(inputs)
    
@@ -256,8 +268,8 @@ def FSRCNNv2(input_shape, depth_multi=1, multi_output=False, scale=3, finetuned=
 
     else:
         deconv = Conv2DTranspose(filters=32, kernel_size=5, strides=scale, padding="same", name="deconv", activation="elu")(conv4)
-        conv1 = Convolution2D(filters=64, kernel_size=9, padding="same", name="conv1", activation="relu")(deconv)
-        mapping = Convolution2D(filters=32, kernel_size=5, padding="same", name="mapping", activation="relu")(conv1)
+        conv1_ = Convolution2D(filters=64, kernel_size=9, padding="same", name="conv1_", activation="relu")(deconv)
+        mapping = Convolution2D(filters=32, kernel_size=5, padding="same", name="mapping", activation="relu")(conv1_)
         
         if multi_output:
             out = Convolution2D(filters=2, kernel_size=5, padding="same", name="output", activation="sigmoid")(mapping)
